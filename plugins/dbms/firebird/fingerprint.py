@@ -2,7 +2,7 @@
 
 """
 Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
-See the file 'doc/COPYING' for copying permission
+See the file 'LICENSE' for copying permission
 """
 
 import re
@@ -18,7 +18,6 @@ from lib.core.enums import DBMS
 from lib.core.session import setDbms
 from lib.core.settings import FIREBIRD_ALIASES
 from lib.core.settings import METADB_SUFFIX
-from lib.core.settings import UNKNOWN_DBMS_VERSION
 from lib.request import inject
 from plugins.generic.fingerprint import Fingerprint as GenericFingerprint
 
@@ -53,7 +52,7 @@ class Fingerprint(GenericFingerprint):
         if kb.bannerFp:
             banVer = kb.bannerFp["dbmsVersion"]
 
-            if re.search("-log$", kb.data.banner):
+            if re.search(r"-log$", kb.data.banner):
                 banVer += ", logging enabled"
 
             banVer = Format.getDbms([banVer])

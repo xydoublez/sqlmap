@@ -2,10 +2,11 @@
 
 """
 Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
-See the file 'doc/COPYING' for copying permission
+See the file 'LICENSE' for copying permission
 """
 
 import re
+import time
 import types
 import urllib2
 import urlparse
@@ -50,18 +51,16 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
             if kb.redirectChoice is None:
                 msg = "sqlmap got a %d redirect to " % redcode
                 msg += "'%s'. Do you want to follow? [Y/n] " % redurl
-                choice = readInput(msg, default="Y")
 
-                kb.redirectChoice = choice.upper()
+                kb.redirectChoice = REDIRECTION.YES if readInput(msg, default='Y', boolean=True) else REDIRECTION.NO
 
             if kb.redirectChoice == REDIRECTION.YES and method == HTTPMETHOD.POST and kb.resendPostOnRedirect is None:
                 msg = "redirect is a result of a "
                 msg += "POST request. Do you want to "
                 msg += "resend original POST data to a new "
                 msg += "location? [%s] " % ("Y/n" if not kb.originalPage else "y/N")
-                choice = readInput(msg, default=("Y" if not kb.originalPage else "N"))
 
-                kb.resendPostOnRedirect = choice.upper() == 'Y'
+                kb.resendPostOnRedirect = readInput(msg, default=('Y' if not kb.originalPage else 'N'), boolean=True)
 
             if kb.resendPostOnRedirect:
                 self.redirect_request = self._redirect_request
@@ -71,6 +70,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         return urllib2.Request(newurl, data=req.data, headers=req.headers, origin_req_host=req.get_origin_req_host())
 
     def http_error_302(self, req, fp, code, msg, headers):
+        start = time.time()
         content = None
         redurl = self._get_header_redirect(headers) if not conf.ignoreRedirects else None
 
@@ -94,18 +94,18 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
         threadData.lastRedirectMsg = (threadData.lastRequestUID, content)
 
         redirectMsg = "HTTP redirect "
-        redirectMsg += "[#%d] (%d %s):\n" % (threadData.lastRequestUID, code, getUnicode(msg))
+        redirectMsg += "[#%d] (%d %s):\r\n" % (threadData.lastRequestUID, code, getUnicode(msg))
 
         if headers:
-            logHeaders = "\n".join("%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in headers.items())
+            logHeaders = "\r\n".join("%s: %s" % (getUnicode(key.capitalize() if isinstance(key, basestring) else key), getUnicode(value)) for (key, value) in headers.items())
         else:
             logHeaders = ""
 
         redirectMsg += logHeaders
         if content:
-            redirectMsg += "\n\n%s" % getUnicode(content[:MAX_CONNECTION_CHUNK_SIZE])
+            redirectMsg += "\r\n\r\n%s" % getUnicode(content[:MAX_CONNECTION_CHUNK_SIZE])
 
-        logHTTPTraffic(threadData.lastRequestMsg, redirectMsg)
+        logHTTPTraffic(threadData.lastRequestMsg, redirectMsg, start, time.time())
         logger.log(CUSTOM_LOGGING.TRAFFIC_IN, redirectMsg)
 
         if redurl:
@@ -129,7 +129,7 @@ class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
                 if HTTP_HEADER.COOKIE not in req.headers:
                     req.headers[HTTP_HEADER.COOKIE] = _
                 else:
-                    req.headers[HTTP_HEADER.COOKIE] = re.sub("%s{2,}" % delimiter, delimiter, ("%s%s%s" % (re.sub(r"\b%s=[^%s]*%s?" % (_.split('=')[0], delimiter, delimiter), "", req.headers[HTTP_HEADER.COOKIE]), delimiter, _)).strip(delimiter))
+                    req.headers[HTTP_HEADER.COOKIE] = re.sub(r"%s{2,}" % delimiter, delimiter, ("%s%s%s" % (re.sub(r"\b%s=[^%s]*%s?" % (re.escape(_.split('=')[0]), delimiter, delimiter), "", req.headers[HTTP_HEADER.COOKIE]), delimiter, _)).strip(delimiter))
             try:
                 result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
             except urllib2.HTTPError, e:

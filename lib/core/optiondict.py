@@ -2,7 +2,7 @@
 
 """
 Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
-See the file 'doc/COPYING' for copying permission
+See the file 'LICENSE' for copying permission
 """
 
 optDict = {
@@ -38,7 +38,7 @@ optDict = {
                                "authType":          "string",
                                "authCred":          "string",
                                "authFile":          "string",
-                               "ignore401":         "boolean",
+                               "ignoreCode":        "integer",
                                "ignoreProxy":       "boolean",
                                "ignoreRedirects":   "boolean",
                                "ignoreTimeouts":    "boolean",
@@ -77,8 +77,8 @@ optDict = {
                                "testParameter":     "string",
                                "skip":              "string",
                                "skipStatic":        "boolean",
-                               "skip":              "string",
                                "paramExclude":      "string",
+                               "dbms":              "string",
                                "dbmsCred":          "string",
                                "os":                "string",
                                "invalidBignum":     "boolean",
@@ -196,14 +196,17 @@ optDict = {
                                "batch":             "boolean",
                                "binaryFields":      "string",
                                "charset":           "string",
+                               "checkInternet":     "boolean",
                                "crawlDepth":        "integer",
                                "crawlExclude":      "string",
                                "csvDel":            "string",
                                "dumpFormat":        "string",
+                               "encoding":          "string",
                                "eta":               "boolean",
                                "flushSession":      "boolean",
                                "forms":             "boolean",
                                "freshQueries":      "boolean",
+                               "harFile":           "string",
                                "hexConvert":        "boolean",
                                "outputDir":         "string",
                                "parseErrors":       "boolean",
@@ -243,5 +246,10 @@ optDict = {
                                "liveTest":          "boolean",
                                "stopFail":          "boolean",
                                "runCase":           "string",
+                      },
+            "API": {
+                               "api":               "boolean",
+                               "taskid":            "string",
+                               "database":          "string",
                       }
           }

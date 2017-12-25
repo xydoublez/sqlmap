@@ -2,12 +2,11 @@
 
 """
 Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
-See the file 'doc/COPYING' for copying permission
+See the file 'LICENSE' for copying permission
 """
 
 import difflib
 import random
-import thread
 import threading
 import time
 import traceback
@@ -65,10 +64,7 @@ class _ThreadData(threading.local):
 
 ThreadData = _ThreadData()
 
-def getCurrentThreadUID():
-    return hash(threading.currentThread())
-
-def readInput(message, default=None):
+def readInput(message, default=None, checkBatch=True, boolean=False):
     # It will be overwritten by original from lib.core.common
     pass
 
@@ -88,7 +84,7 @@ def getCurrentThreadName():
 
     return threading.current_thread().getName()
 
-def exceptionHandledFunction(threadFunction):
+def exceptionHandledFunction(threadFunction, silent=False):
     try:
         threadFunction()
     except KeyboardInterrupt:
@@ -96,8 +92,8 @@ def exceptionHandledFunction(threadFunction):
         kb.threadException = True
         raise
     except Exception, ex:
-        # thread is just going to be silently killed
-        logger.error("thread %s: %s" % (threading.currentThread().getName(), ex.message))
+        if not silent:
+            logger.error("thread %s: %s" % (threading.currentThread().getName(), ex.message))
 
 def setDaemon(thread):
     # Reference: http://stackoverflow.com/questions/190010/daemon-threads-explanation
@@ -151,7 +147,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
 
             try:
                 thread.start()
-            except thread.error, ex:
+            except Exception, ex:
                 errMsg = "error occurred while starting new thread ('%s')" % ex.message
                 logger.critical(errMsg)
                 break
@@ -208,7 +204,7 @@ def runThreads(numThreads, threadFunction, cleanupFunction=None, forwardExceptio
             if lock.locked():
                 try:
                     lock.release()
-                except thread.error:
+                except:
                     pass
 
         if conf.get("hashDB"):

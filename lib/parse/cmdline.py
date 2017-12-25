@@ -2,7 +2,7 @@
 
 """
 Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
-See the file 'doc/COPYING' for copying permission
+See the file 'LICENSE' for copying permission
 """
 
 import os
@@ -31,7 +31,6 @@ from lib.core.settings import BASIC_HELP_ITEMS
 from lib.core.settings import DUMMY_URL
 from lib.core.settings import IS_WIN
 from lib.core.settings import MAX_HELP_OPTION_LENGTH
-from lib.core.settings import UNICODE_ENCODING
 from lib.core.settings import VERSION_STRING
 from lib.core.shell import autoCompletion
 from lib.core.shell import clearHistory
@@ -48,7 +47,8 @@ def cmdLineParser(argv=None):
 
     checkSystemEncoding()
 
-    _ = getUnicode(os.path.basename(argv[0]), encoding=sys.getfilesystemencoding() or UNICODE_ENCODING)
+    # Reference: https://stackoverflow.com/a/4012683 (Note: previously used "...sys.getfilesystemencoding() or UNICODE_ENCODING")
+    _ = getUnicode(os.path.basename(argv[0]), encoding=sys.stdin.encoding)
 
     usage = "%s%s [options]" % ("python " if not IS_WIN else "", \
             "\"%s\"" % _ if " " in _ else _)
@@ -149,8 +149,8 @@ def cmdLineParser(argv=None):
         request.add_option("--auth-file", dest="authFile",
                            help="HTTP authentication PEM cert/private key file")
 
-        request.add_option("--ignore-401", dest="ignore401", action="store_true",
-                          help="Ignore HTTP Error 401 (Unauthorized)")
+        request.add_option("--ignore-code", dest="ignoreCode", type="int",
+                          help="Ignore HTTP error code (e.g. 401)")
 
         request.add_option("--ignore-proxy", dest="ignoreProxy", action="store_true",
                            help="Ignore system default proxy settings")
@@ -321,7 +321,7 @@ def cmdLineParser(argv=None):
 
         detection.add_option("--risk", dest="risk", type="int",
                              help="Risk of tests to perform (1-3, "
-                                  "default %d)" % defaults.level)
+                                  "default %d)" % defaults.risk)
 
         detection.add_option("--string", dest="string",
                              help="String to match when "
@@ -617,9 +617,6 @@ def cmdLineParser(argv=None):
         general = OptionGroup(parser, "General", "These options can be used "
                              "to set some general working parameters")
 
-        #general.add_option("-x", dest="xmlFile",
-        #                    help="Dump the data into an XML file")
-
         general.add_option("-s", dest="sessionFile",
                             help="Load session from a stored (.sqlite) file")
 
@@ -629,13 +626,14 @@ def cmdLineParser(argv=None):
 
         general.add_option("--batch", dest="batch",
                             action="store_true",
-                            help="Never ask for user input, use the default behaviour")
+                            help="Never ask for user input, use the default behavior")
 
         general.add_option("--binary-fields", dest="binaryFields",
                           help="Result fields having binary values (e.g. \"digest\")")
 
-        general.add_option("--charset", dest="charset",
-                            help="Force character encoding used for data retrieval")
+        general.add_option("--check-internet", dest="checkInternet",
+                            action="store_true",
+                            help="Check Internet connection before assessing the target")
 
         general.add_option("--crawl", dest="crawlDepth", type="int",
                             help="Crawl the website starting from the target URL")
@@ -647,13 +645,18 @@ def cmdLineParser(argv=None):
                                   help="Delimiting character used in CSV output "
                                   "(default \"%s\")" % defaults.csvDel)
 
+        general.add_option("--charset", dest="charset",
+                           help="Blind SQL injection charset (e.g. \"0123456789abcdef\")")
+
         general.add_option("--dump-format", dest="dumpFormat",
                                   help="Format of dumped data (CSV (default), HTML or SQLITE)")
 
+        general.add_option("--encoding", dest="encoding",
+                            help="Character encoding used for data retrieval (e.g. GBK)")
+
         general.add_option("--eta", dest="eta",
                             action="store_true",
-                            help="Display for each output the "
-                                 "estimated time of arrival")
+                            help="Display for each output the estimated time of arrival")
 
         general.add_option("--flush-session", dest="flushSession",
                             action="store_true",
@@ -666,6 +669,9 @@ def cmdLineParser(argv=None):
         general.add_option("--fresh-queries", dest="freshQueries",
                             action="store_true",
                             help="Ignore query results stored in session file")
+
+        general.add_option("--har", dest="harFile",
+                           help="Log all HTTP traffic into a HAR file")
 
         general.add_option("--hex", dest="hexConvert",
                             action="store_true",
@@ -770,9 +776,6 @@ def cmdLineParser(argv=None):
         parser.add_option("--murphy-rate", dest="murphyRate", type="int",
                           help=SUPPRESS_HELP)
 
-        parser.add_option("--pickled-options", dest="pickledOptions",
-                          help=SUPPRESS_HELP)
-
         parser.add_option("--disable-precon", dest="disablePrecon", action="store_true",
                           help=SUPPRESS_HELP)
 
@@ -780,6 +783,9 @@ def cmdLineParser(argv=None):
                           help=SUPPRESS_HELP)
 
         parser.add_option("--profile", dest="profile", action="store_true",
+                          help=SUPPRESS_HELP)
+
+        parser.add_option("--force-dbms", dest="forceDbms",
                           help=SUPPRESS_HELP)
 
         parser.add_option("--force-dns", dest="forceDns", action="store_true",
@@ -798,6 +804,14 @@ def cmdLineParser(argv=None):
                           help=SUPPRESS_HELP)
 
         parser.add_option("--run-case", dest="runCase", help=SUPPRESS_HELP)
+
+        # API options
+        parser.add_option("--api", dest="api", action="store_true",
+                          help=SUPPRESS_HELP)
+
+        parser.add_option("--taskid", dest="taskid", help=SUPPRESS_HELP)
+
+        parser.add_option("--database", dest="database", help=SUPPRESS_HELP)
 
         parser.add_option_group(target)
         parser.add_option_group(request)
@@ -839,8 +853,9 @@ def cmdLineParser(argv=None):
         advancedHelp = True
         extraHeaders = []
 
+        # Reference: https://stackoverflow.com/a/4012683 (Note: previously used "...sys.getfilesystemencoding() or UNICODE_ENCODING")
         for arg in argv:
-            _.append(getUnicode(arg, encoding=sys.getfilesystemencoding() or UNICODE_ENCODING))
+            _.append(getUnicode(arg, encoding=sys.stdin.encoding))
 
         argv = _
         checkDeprecatedOptions(argv)
@@ -963,7 +978,7 @@ def cmdLineParser(argv=None):
 
         if not any((args.direct, args.url, args.logFile, args.bulkFile, args.googleDork, args.configFile, \
             args.requestFile, args.updateAll, args.smokeTest, args.liveTest, args.wizard, args.dependencies, \
-            args.purgeOutput, args.pickledOptions, args.sitemapUrl)):
+            args.purgeOutput, args.sitemapUrl)):
             errMsg = "missing a mandatory option (-d, -u, -l, -m, -r, -g, -c, -x, --wizard, --update, --purge-output or --dependencies), "
             errMsg += "use -h for basic or -hh for advanced help\n"
             parser.error(errMsg)

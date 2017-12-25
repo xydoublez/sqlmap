@@ -2,7 +2,7 @@
 
 """
 Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
-See the file 'doc/COPYING' for copying permission
+See the file 'LICENSE' for copying permission
 """
 
 import re
@@ -22,7 +22,7 @@ class Syntax:
         retVal = expression
 
         if quote:
-            for item in re.findall(r"'[^']*'+", expression, re.S):
+            for item in re.findall(r"'[^']*'+", expression):
                 _ = item[1:-1]
                 if _:
                     retVal = retVal.replace(item, escaper(_))

@@ -2,7 +2,7 @@
 
 """
 Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
-See the file 'doc/COPYING' for copying permission
+See the file 'LICENSE' for copying permission
 """
 
 from lib.core.agent import agent
@@ -163,7 +163,7 @@ class XP_cmdshell:
         # Obfuscate the command to execute, also useful to bypass filters
         # on single-quotes
         self._randStr = randomStr(lowercase=True)
-        self._cmd = "0x%s" % hexencode(cmd)
+        self._cmd = "0x%s" % hexencode(cmd, conf.encoding)
         self._forgedCmd = "DECLARE @%s VARCHAR(8000);" % self._randStr
         self._forgedCmd += "SET @%s=%s;" % (self._randStr, self._cmd)
 
@@ -255,9 +255,8 @@ class XP_cmdshell:
                 message = "xp_cmdshell extended procedure does not seem to "
                 message += "be available. Do you want sqlmap to try to "
                 message += "re-enable it? [Y/n] "
-                choice = readInput(message, default="Y")
 
-                if not choice or choice in ("y", "Y"):
+                if readInput(message, default='Y', boolean=True):
                     self._xpCmdshellConfigure(1)
 
                     if self._xpCmdshellCheck():

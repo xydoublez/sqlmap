@@ -2,7 +2,7 @@
 
 """
 Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
-See the file 'doc/COPYING' for copying permission
+See the file 'LICENSE' for copying permission
 """
 
 from plugins.generic.enumeration import Enumeration as GenericEnumeration
@@ -10,7 +10,6 @@ from lib.core.data import conf
 from lib.core.data import kb
 from lib.core.data import logger
 from lib.core.data import queries
-from lib.core.common import Backend
 from lib.core.common import unArrayizeValue
 from lib.core.enums import DBMS
 from lib.core.settings import HSQLDB_DEFAULT_SCHEMA

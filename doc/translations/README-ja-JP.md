@@ -1,6 +1,6 @@
 # sqlmap
 
-[![Build Status](https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master)](https://api.travis-ci.org/sqlmapproject/sqlmap) [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/doc/COPYING) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
+[![Build Status](https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master)](https://api.travis-ci.org/sqlmapproject/sqlmap) [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
 
 sqlmapはオープンソースのペネトレーションテスティングツールです。SQLインジェクションの脆弱性の検出、活用、そしてデータベースサーバ奪取のプロセスを自動化します。
 強力な検出エンジン、ペネトレーションテスターのための多くのニッチ機能、持続的なデータベースのフィンガープリンティングから、データベースのデータ取得やアウトオブバンド接続を介したオペレーティング・システム上でのコマンド実行、ファイルシステムへのアクセスなどの広範囲に及ぶスイッチを提供します。
@@ -35,7 +35,7 @@ sqlmapは、 [Python](http://www.python.org/download/) バージョン **2.6.x**
     python sqlmap.py -hh
 
 実行例を [こちら](https://asciinema.org/a/46601) で見ることができます。
-sqlmapの概要、機能の一覧、全てのオプションやスイッチの使用法を例とともに、 [ユーザーマニュアル](https://github.com/sqlmapproject/sqlmap/wiki) で確認することができます。
+sqlmapの概要、機能の一覧、全てのオプションやスイッチの使用法を例とともに、 [ユーザーマニュアル](https://github.com/sqlmapproject/sqlmap/wiki/Usage) で確認することができます。
 
 リンク
 ----
@@ -46,9 +46,6 @@ sqlmapの概要、機能の一覧、全てのオプションやスイッチの�
 * 課題管理: https://github.com/sqlmapproject/sqlmap/issues
 * ユーザーマニュアル: https://github.com/sqlmapproject/sqlmap/wiki
 * よくある質問 (FAQ): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* メーリングリストへの参加: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
-* メーリングリストのRSSフィード: http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
-* メーリングリストのアーカイブ: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * デモ: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * スクリーンショット: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots

@@ -2,12 +2,12 @@
 
 """
 Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
-See the file 'doc/COPYING' for copying permission
+See the file 'LICENSE' for copying permission
 """
 
 try:
     import pymysql
-except ImportError:
+except:
     pass
 
 import logging
@@ -37,8 +37,10 @@ class Connector(GenericConnector):
 
         try:
             self.connector = pymysql.connect(host=self.hostname, user=self.user, passwd=self.password, db=self.db, port=self.port, connect_timeout=conf.timeout, use_unicode=True)
-        except (pymysql.OperationalError, pymysql.InternalError, struct.error), msg:
+        except (pymysql.OperationalError, pymysql.InternalError), msg:
             raise SqlmapConnectionException(msg[1])
+        except struct.error, msg:
+            raise SqlmapConnectionException(msg)
 
         self.initCursor()
         self.printConnected()

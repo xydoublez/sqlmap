@@ -2,7 +2,7 @@
 
 """
 Copyright (c) 2006-2017 sqlmap developers (http://sqlmap.org/)
-See the file 'doc/COPYING' for copying permission
+See the file 'LICENSE' for copying permission
 """
 
 from lib.controller.handler import setHandler
@@ -16,8 +16,8 @@ from lib.core.enums import CONTENT_TYPE
 from lib.core.exception import SqlmapNoneDataException
 from lib.core.exception import SqlmapUnsupportedDBMSException
 from lib.core.settings import SUPPORTED_DBMS
-from lib.techniques.brute.use import columnExists
-from lib.techniques.brute.use import tableExists
+from lib.utils.brute import columnExists
+from lib.utils.brute import tableExists
 
 def action():
     """

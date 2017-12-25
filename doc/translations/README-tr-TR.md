@@ -1,6 +1,6 @@
 # sqlmap
 
-[![Build Status](https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master)](https://api.travis-ci.org/sqlmapproject/sqlmap) [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/doc/COPYING) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
+[![Build Status](https://api.travis-ci.org/sqlmapproject/sqlmap.svg?branch=master)](https://api.travis-ci.org/sqlmapproject/sqlmap) [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-GPLv2-red.svg)](https://raw.githubusercontent.com/sqlmapproject/sqlmap/master/LICENSE) [![Twitter](https://img.shields.io/badge/twitter-@sqlmap-blue.svg)](https://twitter.com/sqlmap)
 
 sqlmap sql injection açıklarını otomatik olarak tespit ve istismar etmeye yarayan açık kaynak bir penetrasyon aracıdır. sqlmap gelişmiş tespit özelliğinin yanı sıra penetrasyon testleri sırasında gerekli olabilecek bir çok aracı, -uzak veritabınınından, veri indirmek, dosya sistemine erişmek, dosya çalıştırmak gibi - işlevleri de barındırmaktadır.
 
@@ -37,7 +37,7 @@ Bütün seçenekleri gösterir
 
     python sqlmap.py -hh
 
-Program ile ilgili örnekleri [burada](https://asciinema.org/a/46601) bulabilirsiniz. Daha fazlası içinsqlmap'in bütün açıklamaları ile birlikte bütün özelliklerinin, örnekleri ile bulunduğu  [manuel sayfamıza](https://github.com/sqlmapproject/sqlmap/wiki) bakmanızı tavsiye ediyoruz
+Program ile ilgili örnekleri [burada](https://asciinema.org/a/46601) bulabilirsiniz. Daha fazlası içinsqlmap'in bütün açıklamaları ile birlikte bütün özelliklerinin, örnekleri ile bulunduğu  [manuel sayfamıza](https://github.com/sqlmapproject/sqlmap/wiki/Usage) bakmanızı tavsiye ediyoruz
 
 Links
 ----
@@ -48,9 +48,6 @@ Links
 * Hata takip etme sistemi: https://github.com/sqlmapproject/sqlmap/issues
 * Kullanıcı Manueli: https://github.com/sqlmapproject/sqlmap/wiki
 * Sıkça Sorulan Sorular(SSS): https://github.com/sqlmapproject/sqlmap/wiki/FAQ
-* Mail listesi: https://lists.sourceforge.net/lists/listinfo/sqlmap-users
-* Mail RSS takibi: http://rss.gmane.org/messages/complete/gmane.comp.security.sqlmap
-* Mail listesi arşivi: http://news.gmane.org/gmane.comp.security.sqlmap
 * Twitter: [@sqlmap](https://twitter.com/sqlmap)
 * Demolar: [http://www.youtube.com/user/inquisb/videos](http://www.youtube.com/user/inquisb/videos)
 * Ekran görüntüleri: https://github.com/sqlmapproject/sqlmap/wiki/Screenshots
